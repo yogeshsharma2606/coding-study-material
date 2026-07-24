@@ -20,6 +20,26 @@ Unlike a raw list of solutions, this repo focuses on the thing interviews actual
 
 ---
 
+## Interview study material (pattern-grouped deep dives)
+
+The [`interview-study-material/`](interview-study-material/) folder is a **curated, pattern-grouped** companion to `categories/`. Every topic README there is a full lesson: **how to recognize the pattern**, **the direction of thinking**, an **approach + why it works**, a **dry run**, **time/space complexity**, and a **review checklist** — written so the ideas stick after one read. Start with its [overview README](interview-study-material/README.md), then work top to bottom:
+
+| # | Topic | Deep-dive lessons |
+|---|---|---|
+| 01 | Data structures | [Linked lists](interview-study-material/01-data-structures/linked-lists/README.md) · [Stack & queue](interview-study-material/01-data-structures/stack-and-queue/README.md) · [Binary trees](interview-study-material/01-data-structures/trees/README.md) |
+| 02 | Searching & sorting | [Binary search](interview-study-material/02-searching-and-sorting/binary-search/README.md) · [Sorting](interview-study-material/02-searching-and-sorting/sorting/README.md) |
+| 03 | Arrays & hashing | [Subarrays](interview-study-material/03-arrays-and-hashing/subarrays/README.md) · [Array transformations](interview-study-material/03-arrays-and-hashing/array-transformations/README.md) · [Hashing](interview-study-material/03-arrays-and-hashing/hashing/README.md) |
+| 04 | Sliding window & two pointers | [Sliding window](interview-study-material/04-sliding-window-and-two-pointers/sliding-window/README.md) · [Two pointers](interview-study-material/04-sliding-window-and-two-pointers/two-pointers/README.md) |
+| 05 | Monotonic structures | [Monotonic stack](interview-study-material/05-monotonic-structures/monotonic-stack/README.md) |
+| 06 | Strings | [String processing](interview-study-material/06-strings/string-processing/README.md) · [Anagrams](interview-study-material/06-strings/anagrams/README.md) |
+| 07 | Graphs | [Graph traversal](interview-study-material/07-graphs/graph-traversal/README.md) |
+| 08 | Greedy | [Stock problems](interview-study-material/08-greedy/stock-problems/README.md) |
+| 09 | Go concurrency | [Concurrency patterns](interview-study-material/09-go-concurrency/concurrency-patterns/README.md) |
+| 10 | System design | [Caching](interview-study-material/10-system-design/caching/README.md) · [Resilience & traffic control](interview-study-material/10-system-design/resilience-and-control/README.md) |
+| 11 | Applied problems | [Advanced exercises](interview-study-material/11-applied-problems/advanced-exercises/README.md) |
+
+---
+
 ## How to think in an interview (the universal framework)
 
 Most candidates fail not because they don't know algorithms, but because they jump to code. Use this sequence out loud - it is what senior interviewers grade:
