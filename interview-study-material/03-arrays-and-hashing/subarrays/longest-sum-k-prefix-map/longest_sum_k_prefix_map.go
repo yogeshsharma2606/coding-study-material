@@ -163,6 +163,34 @@ func largestSubarraySumK(arr []int, k int) int {
 	return maxLength
 }
 
+
+func subarraySumWithArrayAndLength(nums []int, target int) ([]int, int) {
+	// prefixSum -> index
+	prefix := map[int]int{
+		0: -1,
+	}
+
+	sum := 0
+
+	for i, num := range nums {
+		sum += num
+
+		// If sum-target was seen before,
+		// the elements after that index up to i
+		// sum to target.
+		if start, ok := prefix[sum-target]; ok {
+			return nums[start+1 : i+1], len(nums[start+1 : i+1])
+		}
+
+		// Store first occurrence of prefix sum
+		if _, ok := prefix[sum]; !ok {
+			prefix[sum] = i
+		}
+	}
+
+	return []int{}, 0
+}
+
 func main() {
 	// Other test cases
 	fmt.Println("\nOther test cases:")
@@ -170,7 +198,10 @@ func main() {
 	k1 := 15
 	fmt.Printf("Array: %v, k: %d, Largest subarray length: %d\n", arr1, k1, largestSubarraySumK(arr1, k1))
 
-	arr3 := []int{-5, 8, -14, 2, 4, 12}
-	k3 := -5
-	fmt.Printf("Array: %v, k: %d, Largest subarray length: %d\n", arr3, k3, largestSubarraySumK(arr3, k3))
+	arr := []int{2, -1, 2, -3, -4, 5, -6, 7, 8, 9, 10} // Output: [7,8] , 2
+	target := 15
+
+	subarray, length := subarraySumWithArrayAndLength(arr, target)
+	fmt.Println("Subarray:", subarray)
+	fmt.Println("Length:", length)
 }
