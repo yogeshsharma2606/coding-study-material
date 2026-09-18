@@ -53,6 +53,91 @@ Answer **3** (`"wke"`).
 - **O(n) time, O(min(n, alphabet)) space.** `left` only moves forward, never resets — that's what keeps it linear.
 - **Gotcha:** the `lastIndex >= left` check is essential; a stale occurrence *outside* the window must not drag `left` backward.
 
+### [Longest Repeating Character Replacement](longest-repeating-character-replacement/character_replacement.go)
+
+Length of the longest substring that can be converted into the **same character** using at most `k` replacements — a **variable sliding window**.
+
+**How to think about it:** expand `right` one character at a time and maintain a frequency map `char -> count` for the current window.
+
+The character with the highest frequency is the character we keep. Every other character needs to be replaced.
+
+The key formula is:
+
+```text
+replacements = windowSize - maxFreq
+```
+
+If `replacements <= k`, the current window is valid.
+
+If `replacements > k`, shrink the window from the left until it becomes valid again.
+
+**Dry run** — `s = "AABABBA", k = 1`:
+
+```text
+A:       "A"       maxFreq=1  replacements=0  len=1
+A:       "AA"      maxFreq=2  replacements=0  len=2
+B:       "AAB"     maxFreq=2  replacements=1  len=3
+A:       "AABA"    maxFreq=3  replacements=1  len=4  <- max
+
+B:       "AABAB"   maxFreq=3  replacements=2  > k
+         shrink -> "ABAB"
+
+B:       "ABABB"   maxFreq=3  replacements=2  > k
+         shrink -> "BABB"
+
+A:       "BABBA"   maxFreq=3  replacements=2  > k
+         shrink -> "ABBA"
+```
+
+Answer **4** — substring `"AABA"` can become `"AAAA"` with 1 replacement.
+
+### Complexity
+
+* **Time:** `O(n)`
+* **Space:** `O(alphabet)` — effectively `O(1)` for a fixed alphabet.
+
+`right` moves forward once and `left` also only moves forward, so every character is processed a constant number of times.
+
+### Important Insight
+
+We don't need to explicitly determine which characters to replace.
+
+For example:
+
+```text
+Window = "AABA"
+
+A appears 3 times
+B appears 1 time
+
+windowSize = 4
+maxFreq    = 3
+
+replacements = 4 - 3
+             = 1
+```
+
+Therefore, with `k = 1`, `"AABA"` is valid because we can replace `B` with `A`.
+
+### Gotcha
+
+`maxFreq` does **not need to decrease** when the left side of the window moves.
+
+It may become stale, but this still produces the correct maximum-length answer and keeps the algorithm `O(n)`.
+
+### Pattern
+
+**Sliding Window + Frequency Map**
+
+This pattern is useful when:
+
+* We need the longest/shortest substring.
+* The window has a constraint.
+* We need to track character frequencies.
+* We can expand and shrink the window based on a calculated condition.
+
+
+
 ## Review checklist
 
 - Fixed vs variable window: how does `left` move in each?
