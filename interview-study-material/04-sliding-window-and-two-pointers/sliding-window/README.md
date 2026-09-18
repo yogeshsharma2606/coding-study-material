@@ -53,7 +53,7 @@ Answer **3** (`"wke"`).
 - **O(n) time, O(min(n, alphabet)) space.** `left` only moves forward, never resets — that's what keeps it linear.
 - **Gotcha:** the `lastIndex >= left` check is essential; a stale occurrence *outside* the window must not drag `left` backward.
 
-### [Longest Repeating Character Replacement](longest-repeating-character-replacement/character_replacement.go)
+### [Longest Repeating Character Replacement](LongestRepeatingCharacterReplacement.go)
 
 Length of the longest substring that can be converted into the **same character** using at most `k` replacements — a **variable sliding window**.
 
