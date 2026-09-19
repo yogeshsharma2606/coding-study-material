@@ -93,23 +93,35 @@ func LongestKDistinct(s string, k int) int {
 // CharacterReplacement returns the length of the longest substring that can be
 // made of a single repeated character by replacing at most k others.
 // Window valid while (windowLen - maxFreq) <= k. Track running maxFreq.
-func CharacterReplacement(s string, k int) int {
-	var count [26]int
-	left, maxFreq, best := 0, 0, 0
+func characterReplacement(s string, k int) int {
+	count := make(map[byte]int)
+	left := 0
+	maxFreq := 0
+	result := 0
 	for right := 0; right < len(s); right++ {
-		count[s[right]-'A']++
-		if count[s[right]-'A'] > maxFreq {
-			maxFreq = count[s[right]-'A']
+		count[s[right]]++
+
+		// Maximum frequency character in current window
+		if count[s[right]] > maxFreq {
+			maxFreq = count[s[right]]
 		}
-		if (right-left+1)-maxFreq > k {
-			count[s[left]-'A']--
+
+		// Characters that need to be replaced
+		windowSize := right - left + 1
+		replacements := windowSize - maxFreq
+
+		// If replacements > k, shrink window
+		if replacements > k {
+			count[s[left]]--
 			left++
 		}
-		if right-left+1 > best {
-			best = right - left + 1
+		windowSize = right - left + 1
+
+		if windowSize > result {
+			result = windowSize
 		}
 	}
-	return best
+	return result
 }
 
 // FindAnagrams returns start indices of p's anagrams within s (fixed window).
