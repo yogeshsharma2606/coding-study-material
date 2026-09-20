@@ -144,31 +144,27 @@ func MaxSubArrayLen(nums []int, k int) int {
 
 // NumMatrix answers immutable 2D region-sum queries in O(1) using a 2D prefix
 // sum where P[i][j] = sum of the rectangle from (0,0) to (i-1,j-1).
-type NumMatrix struct {
-	p [][]int
-}
+func (nm *NumMatrix) SumRegion(
+	row1, col1, row2, col2 int,
+) int {
 
-func NewNumMatrix(matrix [][]int) *NumMatrix {
-	m := len(matrix)
-	if m == 0 {
-		return &NumMatrix{p: [][]int{{0}}}
-	}
-	n := len(matrix[0])
-	p := make([][]int, m+1)
-	for i := range p {
-		p[i] = make([]int, n+1)
-	}
-	for i := 1; i <= m; i++ {
-		for j := 1; j <= n; j++ {
-			p[i][j] = matrix[i-1][j-1] + p[i-1][j] + p[i][j-1] - p[i-1][j-1]
+	sum := 0
+
+	for i := row1; i <= row2; i++ {
+		for j := col1; j <= col2; j++ {
+			sum += nm.matrix[i][j]
 		}
 	}
-	return &NumMatrix{p: p}
+
+	return sum
 }
 
-// SumRegion returns the sum of the rectangle (r1,c1) to (r2,c2) inclusive
-// via inclusion-exclusion on the 2D prefix table.
-func (nm *NumMatrix) SumRegion(r1, c1, r2, c2 int) int {
-	p := nm.p
-	return p[r2+1][c2+1] - p[r1][c2+1] - p[r2+1][c1] + p[r1][c1]
+type NumMatrix struct {
+	matrix [][]int
+}
+
+func Constructor(matrix [][]int) NumMatrix {
+	return NumMatrix{
+		matrix: matrix,
+	}
 }
