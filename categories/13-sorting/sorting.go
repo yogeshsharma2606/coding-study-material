@@ -116,22 +116,26 @@ func CountingSort(nums []int) []int {
 
 // LargestNumber arranges numbers to form the largest concatenation.
 // Custom comparator: a before b iff a+b > b+a as strings.
-func LargestNumber(nums []int) string {
+func largestNumber(nums []int) string {
+	// Convert numbers to strings
 	strs := make([]string, len(nums))
-	for i, n := range nums {
-		strs[i] = strconv.Itoa(n)
+
+	for i, num := range nums {
+		strs[i] = strconv.Itoa(num)
 	}
+
+	// Custom comparator
 	sort.Slice(strs, func(i, j int) bool {
 		return strs[i]+strs[j] > strs[j]+strs[i]
 	})
+
+	// Edge case:
+	// [0, 0, 0] -> "0", not "000"
 	if strs[0] == "0" {
-		return "0" // all zeros
+		return "0"
 	}
-	res := ""
-	for _, s := range strs {
-		res += s
-	}
-	return res
+
+	return strings.Join(strs, "")
 }
 
 // HIndex returns the researcher's h-index. Sort descending; the h-index is the
