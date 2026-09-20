@@ -126,27 +126,57 @@ func characterReplacement(s string, k int) int {
 
 // FindAnagrams returns start indices of p's anagrams within s (fixed window).
 // Compare frequency arrays as the window of len(p) slides over s.
-func FindAnagrams(s, p string) []int {
-	var res []int
-	if len(s) < len(p) {
-		return res
+func findAnagrams(s string, p string) []int {
+	if len(p) > len(s) {
+		return []int{}
 	}
-	var need, win [26]int
+
+	pFreq := make(map[byte]int)
+	windowFreq := make(map[byte]int)
+
+	// Frequency of pattern
 	for i := 0; i < len(p); i++ {
-		need[p[i]-'a']++
-		win[s[i]-'a']++
+		pFreq[p[i]]++
 	}
-	if win == need {
-		res = append(res, 0)
-	}
-	for r := len(p); r < len(s); r++ {
-		win[s[r]-'a']++
-		win[s[r-len(p)]-'a']--
-		if win == need {
-			res = append(res, r-len(p)+1)
+
+	left := 0
+	result := []int{}
+
+	for right := 0; right < len(s); right++ {
+		windowFreq[s[right]]++
+
+		// Keep window size equal to len(p)
+		if right-left+1 > len(p) {
+			windowFreq[s[left]]--
+
+			if windowFreq[s[left]] == 0 {
+				delete(windowFreq, s[left])
+			}
+
+			left++
+		}
+
+		// Compare frequencies
+		if right-left+1 == len(p) && mapsEqual(windowFreq, pFreq) {
+			result = append(result, left)
 		}
 	}
-	return res
+
+	return result
+}
+
+func mapsEqual(a, b map[byte]int) bool {
+	if len(a) != len(b) {
+		return false
+	}
+
+	for key, value := range a {
+		if b[key] != value {
+			return false
+		}
+	}
+
+	return true
 }
 
 // LongestOnes returns the max number of consecutive 1s if you may flip at most
