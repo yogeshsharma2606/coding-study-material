@@ -138,21 +138,30 @@ func DecodeString(s string) string {
 
 // BackspaceCompare compares two strings where '#' is a backspace.
 // Build each result on a stack; '#' pops.
-func BackspaceCompare(s, t string) bool {
-	build := func(str string) string {
-		var st []byte
-		for i := 0; i < len(str); i++ {
-			if str[i] == '#' {
-				if len(st) > 0 {
-					st = st[:len(st)-1]
-				}
-			} else {
-				st = append(st, str[i])
-			}
+func buildString(s string) []byte {
+	stack := make([]byte, 0, len(s))
+	for i := 0; i < len(s); i++ {
+		if s[i] != '#' {
+			stack = append(stack, s[i])
+		} else if len(stack) > 0 {
+			stack = stack[:len(stack)-1]
 		}
-		return string(st)
 	}
-	return build(s) == build(t)
+	return stack
+}
+
+func backspaceCompare(s string, t string) bool {
+	sStack := buildString(s)
+	tStack := buildString(t)
+	if len(sStack) != len(tStack) {
+		return false
+	}
+	for i := range sStack {
+		if sStack[i] != tStack[i] {
+			return false
+		}
+	}
+	return true
 }
 
 // AsteroidCollision resolves collisions. Positive move right, negative left.
