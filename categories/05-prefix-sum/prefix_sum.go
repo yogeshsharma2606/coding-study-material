@@ -43,23 +43,28 @@ func SubarraySumEqualsK(nums []int, k int) int {
 // Map 0 -> -1 so "equal count" becomes "prefix sum returns to a prior value".
 // Store the first index of each prefix value; length = i - firstIndex[prefix].
 func FindMaxLength(nums []int) int {
-	first := map[int]int{0: -1}
-	sum, best := 0, 0
-	for i, x := range nums {
-		if x == 1 {
-			sum++
-		} else {
+	first := map[int]int{
+		0: -1,
+	}
+	sum := 0
+	maxLen := 0
+	for i, num := range nums {
+		if num == 0 {
 			sum--
+		} else {
+			sum++
 		}
-		if j, ok := first[sum]; ok {
-			if i-j > best {
-				best = i - j
+		if start, ok := first[sum]; ok {
+			length := i - start
+			if length > maxLen {
+				maxLen = length
 			}
 		} else {
+			// Store only the first occurrence.
 			first[sum] = i
 		}
 	}
-	return best
+	return maxLen
 }
 
 // PivotIndex returns the leftmost index where left sum == right sum, else -1.
