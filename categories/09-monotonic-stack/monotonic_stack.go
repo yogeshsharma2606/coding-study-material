@@ -10,25 +10,30 @@ package monotonicstack
 // NextGreaterElementI: for each x in nums1 (a subset of nums2), find the first
 // greater element to its right in nums2. Build a value->nextGreater map with a
 // decreasing monotonic stack over nums2, then look up.
-func NextGreaterElementI(nums1, nums2 []int) []int {
-	nextGreater := make(map[int]int, len(nums2))
-	var st []int // decreasing stack of values
-	for _, x := range nums2 {
-		for len(st) > 0 && st[len(st)-1] < x {
-			nextGreater[st[len(st)-1]] = x
-			st = st[:len(st)-1]
+func nextGreaterElement(nums1 []int, nums2 []int) []int {
+	stack := make([]int, 0)
+	nextGreater := make(map[int]int)
+	// Find next greater element for every element in nums2.
+	for _, num := range nums2 {
+		for len(stack) > 0 && num > stack[len(stack)-1] {
+			top := stack[len(stack)-1]
+			stack = stack[:len(stack)-1]
+			nextGreater[top] = num
 		}
-		st = append(st, x)
+		stack = append(stack, num)
 	}
-	out := make([]int, len(nums1))
-	for i, x := range nums1 {
-		if g, ok := nextGreater[x]; ok {
-			out[i] = g
-		} else {
-			out[i] = -1
-		}
+	// Elements remaining in the stack have no greater element.
+	for len(stack) > 0 {
+		top := stack[len(stack)-1]
+		stack = stack[:len(stack)-1]
+		nextGreater[top] = -1
 	}
-	return out
+	// Build result for nums1.
+	result := make([]int, len(nums1))
+	for i, num := range nums1 {
+		result[i] = nextGreater[num]
+	}
+	return result
 }
 
 // NextGreaterElementsII: circular array; find each element's next greater to the
@@ -55,18 +60,22 @@ func NextGreaterElementsII(nums []int) []int {
 
 // DailyTemperatures returns, for each day, how many days until a warmer one.
 // Decreasing stack of indices; when today is warmer, pop and record the gap.
-func DailyTemperatures(temps []int) []int {
-	res := make([]int, len(temps))
-	var st []int // indices, temps decreasing
-	for i, t := range temps {
-		for len(st) > 0 && temps[st[len(st)-1]] < t {
-			j := st[len(st)-1]
-			st = st[:len(st)-1]
-			res[j] = i - j
+func dailyTemperatures(temperatures []int) []int {
+	n := len(temperatures)
+	result := make([]int, n)
+	stack := []int{} // stack stores indices
+
+	for i := 0; i < n; i++ {
+		// Compare current temp with stack top
+		for len(stack) > 0 && temperatures[i] > temperatures[stack[len(stack)-1]] {
+			prevIndex := stack[len(stack)-1]
+			stack = stack[:len(stack)-1]
+			result[prevIndex] = i - prevIndex
 		}
-		st = append(st, i)
+		stack = append(stack, i)
 	}
-	return res
+
+	return result
 }
 
 // LargestRectangleArea finds the largest rectangle in a histogram.
@@ -101,22 +110,27 @@ func LargestRectangleArea(heights []int) int {
 // TrapStack computes trapped rain water with a decreasing stack of indices.
 // When a taller bar arrives, it forms a container with the bar below the popped
 // one; add the bounded water layer by layer.
-func TrapStack(height []int) int {
-	var st []int
+func trap(height []int) int {
+	left, right := 0, len(height)-1
+	leftMax, rightMax := 0, 0
 	water := 0
-	for i, h := range height {
-		for len(st) > 0 && height[st[len(st)-1]] < h {
-			bottom := st[len(st)-1]
-			st = st[:len(st)-1]
-			if len(st) == 0 {
-				break
+
+	for left < right {
+		if height[left] < height[right] {
+			if height[left] >= leftMax {
+				leftMax = height[left]
+			} else {
+				water += leftMax - height[left]
 			}
-			left := st[len(st)-1]
-			width := i - left - 1
-			boundedHeight := min(height[left], h) - height[bottom]
-			water += width * boundedHeight
+			left++
+		} else {
+			if height[right] >= rightMax {
+				rightMax = height[right]
+			} else {
+				water += rightMax - height[right]
+			}
+			right--
 		}
-		st = append(st, i)
 	}
 	return water
 }
@@ -125,65 +139,54 @@ func TrapStack(height []int) int {
 // Contribution technique: each element is the min of (left)*(right) subarrays,
 // where left/right are distances to the previous/next smaller elements (found
 // with monotonic stacks). Strict on one side avoids double counting duplicates.
-func SumSubarrayMins(arr []int) int {
-	const mod = 1_000_000_007
+const MOD int64 = 1_000_000_007
+
+func sumSubarrayMins(arr []int) int {
 	n := len(arr)
-	left := make([]int, n)  // distance to previous element < arr[i] (strict)
-	right := make([]int, n) // distance to next element <= arr[i]
-	var st []int
+	var ans int64
 	for i := 0; i < n; i++ {
-		for len(st) > 0 && arr[st[len(st)-1]] >= arr[i] {
-			st = st[:len(st)-1]
+		minValue := int64(arr[i])
+		for j := i; j < n; j++ {
+			if int64(arr[j]) < minValue {
+				minValue = int64(arr[j])
+			}
+
+			ans = (ans + minValue)
 		}
-		if len(st) == 0 {
-			left[i] = i + 1
-		} else {
-			left[i] = i - st[len(st)-1]
-		}
-		st = append(st, i)
 	}
-	st = st[:0]
-	for i := n - 1; i >= 0; i-- {
-		for len(st) > 0 && arr[st[len(st)-1]] > arr[i] {
-			st = st[:len(st)-1]
-		}
-		if len(st) == 0 {
-			right[i] = n - i
-		} else {
-			right[i] = st[len(st)-1] - i
-		}
-		st = append(st, i)
-	}
-	sum := 0
-	for i := 0; i < n; i++ {
-		sum = (sum + arr[i]*left[i]%mod*right[i]) % mod
-	}
-	return sum
+	return int(ans)
 }
 
 // RemoveKdigits removes k digits from num to make the smallest possible number.
 // Greedily pop larger preceding digits (increasing stack), then trim, then strip
 // leading zeros.
-func RemoveKdigits(num string, k int) string {
-	var st []byte // digits, non-decreasing
-	for i := 0; i < len(num); i++ {
-		c := num[i]
-		for k > 0 && len(st) > 0 && st[len(st)-1] > c {
-			st = st[:len(st)-1]
-			k--
-		}
-		st = append(st, c)
-	}
-	st = st[:len(st)-k] // remove remaining from the end if still positive
-	// strip leading zeros
-	i := 0
-	for i < len(st) && st[i] == '0' {
-		i++
-	}
-	if i == len(st) {
+func removeKdigits(num string, k int) string {
+	if k >= len(num) {
 		return "0"
 	}
-	return string(st[i:])
+	stack := make([]byte, 0, len(num))
+	for i := 0; i < len(num); i++ {
+		digit := num[i]
+		// Remove larger digits from the left
+		// while we still have digits to remove.
+		for k > 0 && len(stack) > 0 && stack[len(stack)-1] > digit {
+			stack = stack[:len(stack)-1]
+			k--
+		}
+		stack = append(stack, digit)
+	}
+	// If k digits are still left to remove,
+	// remove them from the end.
+	if k > 0 {
+		stack = stack[:len(stack)-k]
+	}
+	// Remove leading zeros.
+	result := strings.TrimLeft(string(stack), "0")
+
+	if result == "" {
+		return "0"
+	}
+	return result
 }
 
 // StockSpanner returns, for each new price, the number of consecutive prior days
